@@ -1,102 +1,100 @@
-import speech_recognition as sr  # импорт библиотек
+import tkinter as tk
+from tkinter import ttk
+from tkinter import scrolledtext
+from ttkthemes import ThemedTk
+import speech_recognition as sr
 import pyaudio
-from googletrans import Translator
+from deep_translator import GoogleTranslator
 import pyttsx3
 
-def Settings(): # создаём функцию с настройками
-    print('\n||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
-    vvod = int(input("\n1 назад\n2 просмотреть список доступных языков\n3 текущие языки\n4 выбрать языки\n5 список портов\n6 выбрать порт микрофона\nваш выбор: "))
-
-    if vvod == 1:  # создаём кнопку для выхода назад
-
-        start_code()
-
-    if vvod == 2: # создаём кнопку для просмотра списка воспринимаемых языков
-        with open('list_lang.txt') as file3:
-            list = file3.read()
-            print(list)
-
-    if vvod == 3: # создаём кнопку для просмотра тех, языков которые используются для анализа и перевода в данный момент
-        with open('file0.txt') as file01:
-            a1 = file01.read()
-            print("язык распознования", a1)
-        with open('file1.txt') as file10:
-            b1 = file10.read()
-            print("язык перевода", b1)
-
-    if vvod == 4:  # создаём кнопку для выбора языка
-        with open('file0.txt', 'w') as file0:
-            file0.truncate(0)
-            a = input("какой язык распозновать ")
-            file0.write(str(a))
-
-        with open('file1.txt', 'w') as file1:
-            file1.truncate(0)
-            b = input("на какой переводить ")
-            file1.write(str(b))
-
-    if vvod == 5:  # создаём кнопку для просмотра портов
-        list_mic = sr.Microphone.list_microphone_names()
-        for i in range(0, len(list_mic)):
-            print(i, list_mic[i])
-
-    if vvod == 6:  # создаём копку  для выбора порта
-        with open('file2.txt', 'w') as file2:
-            file2.truncate(0)
-            d = int(input("\nвведите порт микрофона "))
-            file2.write(str(d))
-
-    return Settings()  # возвращаем функцию настроек
-
-def default_Settings():  # создаём функцию с текущими настройками
-    global a, b, d
-
-    with open('file0.txt') as file0:
-        a = str(file0.read())
-
-    with open('file1.txt') as file1:
-        b = str(file1.read())
-
-    with open('file2.txt') as file2:
-        d = str(file2.read())
-
-
-def record_microphone():  # создаём функцию по распознованию речи её переводу и озвучке
-    r = sr.Recognizer()  # обозначаем r как переводчик аудио в текст
-
+def translate_text():
+    r = sr.Recognizer()
     engine = pyttsx3.init()
     engine.setProperty('rate', 150)
     engine.setProperty('volume', 0.9)
 
-    with sr.Microphone(device_index=int(d)) as source:  # обозначаем что выбраный нами порт микрофона является индексом записывающего устрйоства
-        r.adjust_for_ambient_noise(source, duration=0.5)  # избавляемся от посторонних шумов
-
+    with sr.Microphone(device_index=int(d.get())) as source:
+        r.adjust_for_ambient_noise(source, duration=0.5)
         print('\nСлушаю...')
-        audio = r.listen(source)  # записываем данные с микрофона напрямую, в переменную audio
+        audio = r.listen(source)
 
     try:
-        query = r.recognize_google(audio, language=a)  # подключаемся к модели при наличии интернета, и переводим вводные данные в текст
-        text = query.lower()  # обрабатываем текст
-
+        query = r.recognize_google(audio, language=a.get())
+        text = query.lower()
         print(f'было сказано: {text}')
-        txt = Translator().translate(text, src=a, dest=b)
-        print(txt.text)
-        engine.say(txt.text)
+        txt = GoogleTranslator(source=a.get(), target=b.get()).translate(text)
+        print(txt)
+        engine.say(txt)
         engine.runAndWait()
-    except:  # выводим ошибку, если не удалось распознать реч или нет подключения к интернету
+        text_area.insert(tk.INSERT, txt + '\n')
+    except:
         print('Error')
 
-    return record_microphone()
+def save_settings():
+    with open('file0.txt', 'w') as file0:
+        file0.write(a.get())
 
-def start_code(): # запускаем код
+    with open('file1.txt', 'w') as file1:
+        file1.write(b.get())
+
+    with open('file2.txt', 'w') as file2:
+        file2.write(d.get())
+
+def update_settings(*args):
+    save_settings()
     default_Settings()
-    print('\n||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||')
-    vvod = int(input("1 - начать распознание\n2 - настройки\nваш выбор: "))
-    if int(vvod) == 1:  # создаём кнопку на распознование перевод и озвучки речи
-        record_microphone()
-    if int(vvod) == 2: # создаём кнопку для изменения настроек
-        Settings()
-    else:
-        exit()
 
-start_code()
+def default_Settings():
+    with open('file0.txt') as file0:
+        a.set(file0.read())
+
+    with open('file1.txt') as file1:
+        b.set(file1.read())
+
+    with open('file2.txt') as file2:
+        d.set(file2.read())
+
+window = ThemedTk(theme="black")  # Используем тему "black"
+window.title("Голосовой мост")
+window.geometry('800x600')
+
+style = ttk.Style()
+style.configure('TButton', foreground='white', background='black')
+style.configure('TLabel', foreground='white', background='black')
+
+label1 = ttk.Label(window, text="Нажмите кнопку для начала распознавания:")
+label1.grid(column=0, row=0)
+
+translate_button = ttk.Button(window, text="Начать распознавание", command=translate_text)
+translate_button.grid(column=1, row=0)
+
+text_area = scrolledtext.ScrolledText(window, width=70, height=20, bg='black', fg='white')
+text_area.grid(column=0, row=1, columnspan=2)
+
+settings_label = ttk.Label(window, text="Настройки:")
+settings_label.grid(column=0, row=2)
+
+language_options = ['en', 'ru', 'fr', 'de', 'es']
+a = tk.StringVar(window)
+a.set('ru')
+a.trace('w', update_settings)
+language_dropdown = ttk.OptionMenu(window, a, *language_options)
+language_dropdown.grid(column=1, row=2)
+
+translate_options = ['en', 'ru', 'fr', 'de', 'es']
+b = tk.StringVar(window)
+b.set('en')
+b.trace('w', update_settings)
+translate_dropdown = ttk.OptionMenu(window, b, *translate_options)
+translate_dropdown.grid(column=1, row=3)
+
+mic_options = list(range(0, 10))
+d = tk.StringVar(window)
+d.set('0')
+d.trace('w', update_settings)
+mic_dropdown = ttk.OptionMenu(window, d, *mic_options)
+mic_dropdown.grid(column=1, row=4)
+
+default_Settings()  # Вызываем функцию после определения всех переменных
+
+window.mainloop()

@@ -1,10 +1,87 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Translation App</title>
+    <style>
+        body {
+            background: linear-gradient(to bottom, #804AD7, #00288F);
+            color: white;
+            font-family: Arial, sans-serif;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .select-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2%;
+            margin-top: 5px; /* уменьшено с 10px до 5px */
+        }
+        .select-container label {
+            margin-right: 10px;
+        }
+        select {
+            flex-grow: 5;
+            padding: 10px;
+        }
+        .microphone-icon {
+            display: block;
+            margin: 50px auto;
+            width: 190px; /* или ваш желаемый размер */
+            border-radius: 50%; /* делает изображение круглым */
+            border: 2px solid black; /* добавляет черную окантовку */
+        }
+        .gradient-rectangle {
+            width: 352px;
+            height: 283px;
+            background: linear-gradient(#804AD7, #00288F);
+            border-radius: 10px;
+            margin: 1px 0; /* уменьшено с 10px до 5px */
+            border: 2px solid black;
+        }
+    </style>
 </head>
 <body>
-$END$
+    <h1>Голосовой мост</h1>
+
+    <div class="gradient-rectangle"></div>
+
+    <div style="background-color: blue; height: 200px; border-radius: 10px;">
+      <!-- Сюда идет контент -->
+    </div>
+
+    <div class="select-container">
+        <label for="recognition-language">Язык распознавания:</label>
+        <select id="recognition-language" name="recognition-language">
+          <!-- Сюда идут варианты -->
+          <option value="ru" selected>Ru</option>
+          <!-- Добавьте больше вариантов по мере необходимости -->
+        </select>
+    </div>
+
+    <div class="select-container">
+        <label for="translation-language">Язык перевода:</label>
+         <select id="translation-language" name="translation-language">
+           <!-- Сюда идут варианты -->
+           <option value="en" selected>En</option>
+           <!-- Добавьте больше вариантов по мере необходимости -->
+         </select>
+    </div>
+
+     <p>Нажмите кнопку для начала распознавания:</p>
+
+     <!-- Иконка/изображение микрофона -->
+     <img src="microphone-icon.png" alt="" class='microphone-icon' onclick="startRecognition()">
+
+     <script>
+        function startRecognition() {
+            // Здесь добавьте код для начала распознавания голоса
+        }
+     </script>
 </body>
 </html>
